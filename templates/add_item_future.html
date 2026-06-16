@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Add Item (Future Development){% endblock %}
+
+{% block content %}
+
+<h1>Add New Item</h1>
+
+<p style="text-align:center; color:#999;">
+    (Future Development – This feature is not yet implemented)
+</p>
+
+<br>
+
+<div style="max-width:500px; margin:0 auto;">
+
+    <div style="margin-bottom:15px;">
+        <label>Item Name:</label><br>
+        <input type="text" style="width:100%; padding:8px;" placeholder="e.g. Dell Laptop">
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label>Description:</label><br>
+        <input type="text" style="width:100%; padding:8px;" placeholder="Short description">
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label>Category:</label><br>
+        <input type="text" style="width:100%; padding:8px;" placeholder="e.g. Electronics">
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <label>Quantity:</label><br>
+        <input type="number" style="width:100%; padding:8px;" placeholder="0">
+    </div>
+
+    <!-- ✅ Disabled button -->
+    <button disabled style="background-color:#bbb; cursor:not-allowed;">
+        Add Item (Coming Soon)
+    </button>
+
+</div>
+
+{% endblock %}
+``

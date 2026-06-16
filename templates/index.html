@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<h1>Welcome to the Inventory System</h1>
+
+<p style="text-align:center; color:#666;">
+    Select an option below to continue.
+</p>
+
+<br>
+
+<!-- ✅ VIEW INVENTORY -->
+<div class="home-row">
+    <a class="home-btn" href="/inventory">View Inventory</a>
+
+    <div class="home-desc">
+        Displays a list of all available supplies and equipment. Users can browse items,
+        check availability, and view basic details for each item.
+    </div>
+</div>
+
+<!-- ✅ CHECKOUT -->
+<div class="home-row">
+    <a class="home-btn" href="/checkout-page">Checkout Items</a>
+
+    <div class="home-desc">
+        Allows users to select an available item and check it out for use. Once completed,
+        the item is marked as unavailable until it is returned.
+    </div>
+</div>
+
+<!-- ✅ RETURN -->
+<div class="home-row">
+    <a class="home-btn" href="/return-page">Return Items</a>
+
+    <div class="home-desc">
+        Provides a way for users to return items they have previously checked out.
+        Returning an item updates its availability in the system.
+    </div>
+</div>
+
+<!-- ✅ STATUS -->
+<div class="home-row">
+    <a class="home-btn" href="/status">Inventory Status</a>
+
+    <div class="home-desc">
+        Shows a summary of current inventory levels. This section helps staff quickly see
+        what items are available, checked out, or running low.
+    </div>
+</div>
+
+<!-- ✅ TRANSACTIONS (FUTURE) -->
+<div class="home-row">
+    <a class="home-btn" href="/transactions">Transactions</a>
+
+    <div class="home-desc">
+        Displays a history of all checkout and return activity for tracking and auditing purposes.
+        <span style="color:#999;">(Future development)</span>
+    </div>
+</div>
+
+
+<div class="home-row">
+    <a href="/add-item-future" class="home-btn">Add Items</a>
+    <div class="home-desc">
+        Allows administrators to add new inventory items into the system.
+        <span style="color:#999;">(Future Development)</span>
+    </div>
+</div>
+
+
+<br>
+
+<!-- ✅ CHECKOUT CONFIRMATION POPUP -->
+<div id="checkout-popup" style="
+    display:none;
+    position:fixed;
+    top:30%;
+    left:35%;
+    background:white;
+    border:2px solid blue;
+    padding:20px;
+    width:300px;
+    box-shadow: 5px 5px 10px gray;
+">
+
+    <h3 style="color:blue;">✅ Checkout completed</h3>
+
+    <br>
+
+    <button onclick="closeCheckoutPopup()">OK</button>
+
+</div>
+
+<script>
+window.onload = function() {
+    const url = new URL(window.location);
+    const msg = url.searchParams.get('msg');
+
+    if (msg === 'checkout') {
+        showCheckoutPopup();
+
+        url.searchParams.delete('msg');
+        window.history.replaceState({}, document.title, url.pathname);
+    }
+};
+</script>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Select Department{% endblock %}
+
+{% block content %}
+
+<h1>Select Department</h1>
+
+<form action="/set-department" method="POST">
+    <select name="department" required>
+        <option value="">-- Select Department --</option>
+        <option value="IT">IT</option>
+        <option value="HR">HR</option>
+        <option value="Finance">Finance</option>
+        <option value="Operations">Operations</option>
+    </select>
+
+    <br><br>
+
+    <button type="submit">Enter System</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+
+<h1>Checkout</h1>
+
+{% if cart %}
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Item</th>
+            <th>Adjust Quantity</th>
+            <th>Available</th>
+            <th>Actions</th>
+        </tr>
+
+        {% for item in cart %}
+        <tr>
+            <td>{{ item.name }}</td>
+
+            <!-- ✅ COMBINED QUANTITY CONTROLS -->
+            <td>
+
+                <!-- DECREASE -->
+                <form action="/update-cart" method="POST" style="display:inline;">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="action" value="decrease">
+                    <button type="submit">-</button>
+                </form>
+
+                <!-- MANUAL INPUT (AUTO UPDATE) -->
+                <form action="/update-cart-quantity" method="POST" style="display:inline;">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input 
+                        type="number"
+                        name="quantity"
+                        value="{{ item.quantity }}"
+                        min="1"
+                        max="{{ item.available }}"
+                        required
+                        style="width:60px; text-align:center;"
+                        onchange="this.form.submit()"
+                    >
+                </form>
+
+                <!-- INCREASE -->
+                <form action="/update-cart" method="POST" style="display:inline;">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <input type="hidden" name="action" value="increase">
+                    <button type="submit">+</button>
+                </form>
+
+            </td>
+
+            <td>{{ item.available }}</td>
+
+            <!-- REMOVE -->
+            <td>
+                <form action="/remove-from-cart" method="POST">
+                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                    <button type="submit">Remove</button>
+                </form>
+            </td>
+
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+
+    <!-- FINALIZE CHECKOUT -->
+    <form action="/finalize-checkout" method="POST">
+        <button type="submit">Finalize Checkout</button>
+    </form>
+
+{% else %}
+    <p>No items in cart.</p>
+{% endif %}
+
+<br>
+
+<a href="/inventory">Go Back to Inventory</a>
+
+{% endblock %}

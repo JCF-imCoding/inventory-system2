@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Status{% endblock %}
+
+{% block content %}
+
+<h1>Inventory Status</h1>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Item Name</th>
+        <th>Total Inventory</th>
+        <th>Available</th>
+        <th>Checked Out</th>
+        <th>Status</th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+        <td>
+            <!-- ✅ SIMPLE SAFE CLICK -->
+            <a href="#"
+               onclick="showDetails('{{ item[1] }}', '{{ item[2] }}', '{{ item[3] }}'); return false;">
+                {{ item[1] }}
+            </a>
+        </td>
+
+        <td>{{ item[4] }}</td>
+        <td>{{ item[5] }}</td>
+        <td>{{ item[6] }}</td>
+
+        <td>
+            {% if item[5] == 0 %}
+                <span style="color:red;">Out of Stock</span>
+            {% elif item[5] < 3 %}
+                <span style="color:orange;">Low Stock</span>
+            {% else %}
+                <span style="color:green;">OK</span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- ✅ POPUP -->
+<div id="popup" style="
+    display:none;
+    position:fixed;
+    top:20%;
+    left:35%;
+    background:white;
+    border:2px solid black;
+    padding:20px;
+    width:350px;
+    box-shadow:5px 5px 10px gray;
+">
+
+    <h2 id="popup-name"></h2>
+
+    <p><strong>Description:</strong></p>
+    <p id="popup-description"></p>
+
+    <p>
+        <strong>Category:</strong>
+        <span id="popup-category"></span>
+    </p>
+
+    <br>
+
+    <button onclick="closePopup()">Close</button>
+
+</div>
+
+{% endblock %}

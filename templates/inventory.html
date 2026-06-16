@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+
+<h1>View Inventory</h1>
+
+<!-- ✅ Search -->
+<form method="GET" action="/inventory">
+    <input 
+        type="text" 
+        name="search" 
+        placeholder="Search items..." 
+        value="{{ search if search else '' }}"
+    >
+    <button type="submit">Search</button>
+
+    <a href="/inventory">View All</a>
+</form>
+
+<br>
+
+{% if items|length == 0 %}
+    <p>No items found.</p>
+{% endif %}
+
+<!-- ✅ Inventory Table -->
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Category</th>
+        <th>Available</th>
+        <th>Checked Out</th>
+        <th>Action</th>
+    </tr>
+
+    {% for item in items %}
+    <tr>
+
+        <!-- ✅ Clickable name for popup -->
+        <td>
+            <a href="#"
+               onclick="showDetails('{{ item.name }}', '{{ item.description }}', '{{ item.category }}'); return false;">
+                {{ item.name }}
+            </a>
+        </td>
+
+        <td>{{ item.category }}</td>
+        <td>{{ item.available }}</td>
+        <td>{{ item.checked_out }}</td>
+
+        <td>
+            <!-- ✅ Add to Cart -->
+            <form action="/add-to-cart" method="POST">
+                <input type="hidden" name="item_id" value="{{ item.id }}">
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="search" value="{{ search if search else '' }}">
+                <button type="submit">Add to Cart</button>
+            </form>
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+
+<!-- ✅ POPUP MODAL -->
+<div id="popup" style="
+    display:none;
+    position:fixed;
+    top:20%;
+    left:35%;
+    background:white;
+    border:2px solid black;
+    padding:20px;
+    width:300px;
+    box-shadow: 5px 5px 10px gray;
+">
+
+    <h2 id="popup-name"></h2>
+    <p id="popup-description"></p>
+    <p><strong>Category:</strong> <span id="popup-category"></span></p>
+
+    <br>
+    <button onclick="closePopup()">Close</button>
+</div>
+
+<!-- ✅ ADD TO CART CONFIRMATION POPUP -->
+<div id="cart-popup" style="
+    display:none;
+    position:fixed;
+    top:30%;
+    left:35%;
+    background:white;
+    border:2px solid green;
+    padding:20px;
+    width:300px;
+    box-shadow: 5px 5px 10px gray;
+">
+
+    <h3 style="color:green;">✅ Item added to cart</h3>
+
+    <br>
+
+    <button onclick="closeCartPopup()">Continue Browsing</button>
+
+    <a href="/checkout-page">
+        <button>Go to Checkout</button>
+    </a>
+
+</div>
+
+<!-- ✅ ERROR POPUP -->
+<div id="error-popup" style="
+    display:none;
+    position:fixed;
+    top:30%;
+    left:35%;
+    background:white;
+    border:2px solid red;
+    padding:20px;
+    width:300px;
+    box-shadow: 5px 5px 10px gray;
+">
+
+    <h3 style="color:red;" id="error-message"></h3>
+
+    <br>
+
+    <button onclick="closeErrorPopup()">OK</button>
+
+</div>
+
+<!-- ✅ JS -->
+<script>
+window.onload = function() {
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.get('msg') === 'added') {
+        showCartPopup();
+    }
+
+    if (params.get('msg') === 'checkout') {
+        showCheckoutPopup();
+    }
+
+    // ✅ NEW ERROR HANDLING
+    const error = params.get('error');
+
+    if (error) {
+        let message = "";
+
+        if (error === "no_stock") {
+            message = "No inventory available for this item";
+        } else if (error === "invalid_qty") {
+            message = "Invalid quantity entered";
+        } else if (error === "exceeds") {
+            message = "Requested quantity exceeds available inventory";
+        }
+
+        document.getElementById("error-message").innerText = message;
+        document.getElementById("error-popup").style.display = "block";
+
+        // ✅ clean URL so popup doesn't repeat
+        params.delete('error');
+        const newUrl = window.location.pathname + '?' + params.toString();
+        window.history.replaceState({}, document.title, newUrl);
+    }
+};
+</script>
+
+{% endblock %}

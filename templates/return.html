@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Return Items{% endblock %}
+
+{% block content %}
+
+<h1>Return Items</h1>
+
+{% set visible_items = items | selectattr(2, 'gt', 0) | list %}
+
+{% if visible_items | length > 0 %}
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Item Name</th>
+        <th>Checked Out</th>
+        <th>Return Quantity</th>
+    </tr>
+
+    {% for item in visible_items %}
+    <tr>
+        <td>{{ item[1] }}</td>
+        <td>{{ item[2] }}</td>
+
+        <!-- ✅ EVERYTHING IN ONE CELL + ONE FORM -->
+        <td>
+            <form action="/return" method="POST" style="display:inline;">
+                
+                <input type="hidden" name="item_id" value="{{ item[0] }}">
+
+                <!-- MINUS -->
+                <button type="button" onclick="adjustReturn(this, -1)">-</button>
+
+                <!-- INPUT -->
+                <input 
+                    type="number" 
+                    name="quantity" 
+                    value="1"
+                    min="1" 
+                    max="{{ item[2] }}" 
+                    required
+                    style="width:60px; text-align:center;"
+                >
+
+                <!-- PLUS -->
+                <button type="button" onclick="adjustReturn(this, 1)">+</button>
+
+                <!-- SUBMIT -->
+                <button type="submit">Return</button>
+
+            </form>
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>
+
+{% else %}
+
+<p>No items currently checked out.</p>
+
+{% endif %}
+
+<br>
+
+<!-- ✅ RETURN CONFIRMATION POPUP -->
+<div id="return-popup" style="
+    display:none;
+    position:fixed;
+    top:30%;
+    left:35%;
+    background:white;
+    border:2px solid green;
+    padding:20px;
+    width:300px;
+    box-shadow: 5px 5px 10px gray;
+">
+    <h3 style="color:green;">✅ Item returned successfully</h3>
+
+    <br>
+
+    <button onclick="closeReturnPopup()">Return More Items</button>
+    <button onclick="goHome()">Go Home</button>
+</div>
+
+<script>
+window.onload = function() {
+    const url = new URL(window.location);
+    const msg = url.searchParams.get('msg');
+
+    if (msg === 'returned') {
+        showReturnPopup();
+
+        // ✅ prevent repeat popup
+        url.searchParams.delete('msg');
+        window.history.replaceState({}, document.title, url.pathname);
+    }
+};
+</script>
+
+{% endblock %}
