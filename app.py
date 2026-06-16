@@ -207,7 +207,7 @@ def transactions():
 
 
 # ✅ CART - ADD ITEM
-    
+
 @app.route('/add-to-cart', methods=['POST'])
 def add_to_cart():
     if 'department' not in session:
@@ -215,35 +215,55 @@ def add_to_cart():
 
     item_id = request.form['item_id']
     quantity_input = request.form['quantity']
+    search = request.form.get('search')  # ✅ get search ONCE
 
+    # ✅ helper function for all redirects
+    def redirect_inventory(msg=None, error=None):
+        url = '/inventory?'
+
+        params = []
+        if msg:
+            params.append(f'msg={msg}')
+        if error:
+            params.append(f'error={error}')
+        if search:
+            params.append(f'search={search}')
+
+        url += "&".join(params)
+        return redirect(url)
+
+    # ✅ validation: empty
     if quantity_input == "":
-        return "Please enter a quantity"
+        return redirect_inventory(error='invalid_qty')
 
+    # ✅ validation: not a number
     try:
         quantity = int(quantity_input)
     except:
-        return "Invalid quantity"
+        return redirect_inventory(error='invalid_qty')
 
+    # ✅ database lookup
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
 
-    cursor.execute("SELECT name, available_quantity FROM inventory WHERE id=?", (item_id,))
+    cursor.execute(
+        "SELECT name, available_quantity FROM inventory WHERE id=?",
+        (item_id,)
+    )
     item = cursor.fetchone()
     conn.close()
 
     available = item[1]
 
-    # ✅ NEW IMPROVED VALIDATION
-    
+    # ✅ validation logic (ALL using redirect helper)
     if available == 0:
-        return redirect('/inventory?error=no_stock')
+        return redirect_inventory(error='no_stock')
 
     if quantity <= 0:
-        return redirect('/inventory?error=invalid_qty')
+        return redirect_inventory(error='invalid_qty')
 
     if quantity > available:
-        return redirect('/inventory?error=exceeds')
-
+        return redirect_inventory(error='exceeds')
 
     # ✅ CART LOGIC
     if 'cart' not in session:
@@ -257,7 +277,7 @@ def add_to_cart():
             new_quantity = existing_item['quantity'] + quantity
 
             if new_quantity > existing_item['available']:
-                return "Exceeds available quantity"
+                return redirect_inventory(error='exceeds')
 
             existing_item['quantity'] = new_quantity
             found = True
@@ -273,13 +293,8 @@ def add_to_cart():
 
     session['cart'] = cart
 
-    # ✅ PRESERVE SEARCH
-    search = request.form.get('search')
-
-    if search:
-        return redirect(f'/inventory?msg=added&search={search}')
-    else:
-        return redirect('/inventory?msg=added')
+    # ✅ success redirect (same system)
+    return redirect_inventory(msg='added')
 
 
 
@@ -437,4 +452,3 @@ def logout():
 if __name__ == '__main__':
     #app.run(debug=True) #local
     app.run(host='0.0.0.0', port=10000, debug=True) #production
-    
