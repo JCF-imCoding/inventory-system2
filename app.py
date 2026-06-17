@@ -440,14 +440,6 @@ def update_cart_quantity():
 def add_item_future():
     return render_template('add_item_future.html')
 
-# ✅ LOGOUT
-@app.route('/logout', methods=['POST'])
-def logout():
-    session.pop('department', None)
-    session.pop('cart', None)
-    return redirect('/login')
-
-
 @app.route('/checked-out-items')
 def checked_out_items():
     if 'department' not in session:
@@ -477,6 +469,12 @@ def checked_out_items():
 
     return render_template('checked_out_items.html', items=items)
 
+# ✅ LOGOUT
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('department', None)
+    session.pop('cart', None)
+    return redirect('/login')
 
 # ✅ RUN APP
 if __name__ == '__main__':
