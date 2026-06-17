@@ -448,7 +448,37 @@ def logout():
     return redirect('/login')
 
 
+@app.route('/checked-out-items')
+def checked_out_items():
+    if 'department' not in session:
+        return redirect('/login')
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT 
+            inventory.name,
+            transactions.department,
+            SUM(CASE 
+                WHEN transactions.action = 'checkout' THEN transactions.quantity
+                WHEN transactions.action = 'return' THEN -transactions.quantity
+            END) as net_quantity
+        FROM transactions
+        JOIN inventory
+            ON transactions.item_id = inventory.id
+        GROUP BY inventory.name, transactions.department
+        HAVING net_quantity > 0
+        ORDER BY transactions.department, inventory.name
+    """)
+
+    items = cursor.fetchall() or []
+    conn.close()
+
+    return render_template('checked_out_items.html', items=items)
+
+
 # ✅ RUN APP
 if __name__ == '__main__':
-    #app.run(debug=True) #local
-    app.run(host='0.0.0.0', port=10000, debug=True) #production
+    app.run(debug=True) #local
+    #app.run(host='0.0.0.0', port=10000, debug=True) #production
